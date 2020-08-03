@@ -1,6 +1,5 @@
 #!/bin/bash
 #
-# echo -e "\e[1;36m \e[0m"
 #
 # Copyright (c) 2020 Anmol Nayyar. Released under the MIT License.
 # Find me @ https://www.linkedin.com/in/anmol-nayyar/
