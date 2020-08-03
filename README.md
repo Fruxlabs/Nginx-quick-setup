@@ -1,4 +1,4 @@
-# Nginx-roadwarrior-setup
+# Nginx-quick-setup
 Quickly setup a secure static website hosted on Nginx
 
 ### Installation
