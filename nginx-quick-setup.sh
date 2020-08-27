@@ -9,7 +9,7 @@ echo "This script assumes that you are trying to host a basic static website on 
 echo " "
 echo -e "\e[1;33mThis script is tuned specifically for Debian 10 Buster \e[0m"
 echo " "
-echo -e "\e[1;33mStatic files [HTML, CSS, JS etc.] should be existing /var/www directory \e[0m"
+echo -e "\e[1;33mStatic files [HTML, CSS, JS etc.] should be present in some directory \e[0m"
 echo " "
 echo "Performing some basic checks...."
 
@@ -46,17 +46,17 @@ echo -e "\e[1;36mEnter the domain name of your website [Eg. example.com]: \e[0m"
 read DomainName
 echo -e "\e[1;36mEnter the public IP address of your server [xxx.xxx.xxx.xxx]: \e[0m"
 read IpAddress
-echo -e "\e[1;36mEnter the name of root directory where your wesbite files are located in /var/www/ folder [Eg. exampleDirectory]: \e[0m"
+echo -e "\e[1;36mEnter the \e[1;31mfull path\e[1;36m of root directory where your wesbite files are located [Eg. /home/user/website]: \e[0m"
 read OrgSiteDirectory
 echo -e "\e[1;36mDo you have a custom 404 html page in the directory ? (Y/n) \e[0m"
 read custom_html
 if [[ "$custom_html" = 'y' || "$custom_html" = 'Y' ]]; then
-echo -e "\e[1;36mEnter the name of the custom error page [Eg. 404.html]:  \e[0m"
+echo -e "\e[1;36mEnter the name of the custom error page [Eg. 404.html; it should be available in root directory]:  \e[0m"
 read errorPageName
-errorPage="/var/www/$DomainName/$errorPageName"
+errorPage="/$errorPageName"
 else
 echo "The website will be directed to HOME by default"
-errorPage="/var/www/$DomainName/index.html"
+errorPage="/index.html"
 fi
 echo -e "\e[1;36mEnter an Email address to be used for SSL certificate related communication\e[0m"
 read email
@@ -82,7 +82,7 @@ esac
 echo "Please confirm if the information is correct:"
 echo -e "Domain name of your site is \e[1;32m$DomainName\e[0m"
 echo -e "IP address of Server is \e[1;32m $IpAddress \e[0m"
-echo -e "path to root directory of your site is: \e[1;32m/var/www/$OrgSiteDirectory\e[0m"
+echo -e "path to root directory of your site is: \e[1;32m$OrgSiteDirectory\e[0m"
 echo -e "Error Page will be configured as \e[1;32m$errorPage\e[0m"
 echo -e "Email address for SSL communication is \e[1;32m$email\e[0m"
 echo -e "Key size for SSL certificates will be \e[1;32m$key_size\e[0m"
@@ -90,7 +90,7 @@ echo -e "\e[1;36mKindly confirm if the data is correct (Y/n)\e[0m"
 read dataConfirm
 
 if [[ "$dataConfirm" = 'y' || "$dataConfirm" = 'Y' ]]; then
-mv /var/www/$OrgSiteDirectory /var/www/$DomainName
+:
 else
 echo " "
 echo -e "\e[1;31mKindly execute the script again an re-enter the data\e[0m"
@@ -127,6 +127,15 @@ echo "Configuring Nginx"
 cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.save
 rm /etc/nginx/sites-available/default
 rm /etc/nginx/sites-enabled/default
+
+mv $OrgSiteDirectory /var/www/$DomainName
+
+if [[ -e "/var/www/$DomainName" ]]; then
+:
+else
+echo "\e[1;31mThere was some issue with the path you supplied, kindly run the script with full path to your website or manuaally copy the directory to /var/www folder and rename it as $DomainName\e[0m"
+exit
+fi
 
 #Temporary File for certificate
 echo "server {" > /etc/nginx/sites-available/$DomainName
